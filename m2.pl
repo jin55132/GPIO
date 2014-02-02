@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/osr/bin/perl 
 #use strict;
 #rse warnings;
 use 5.010;
@@ -41,26 +41,93 @@ use 5.010;
 #my $pid = <$fh>;
 #say $pid;
 #Daemon::Mplayer::mplayer_stop($pid);
+#------------------------------------------------
+#use Audio::Play::MPlayer;
+##use Term::ReadKey;
+#
+##ReadMode 4;
+#
+#
+#
+#$player = Audio::Play::MPlayer->new;
+#say $player->state;
+#$player->load( "/Users/operator1732/Downloads/mp3/frozen/go.mp3" ) unless $player->state;
+#$player->poll(0);
+#$player->stop;
+#
+#
+#$player->poll(0) until $player->state == 0;
 
-use Audio::Play::MPlayer;
+#while (1)
+#{
+#
+#
+#	my $key = Term::ReadKey::ReadKey(-1);
+#	if(defined $key){
+#	
+#		if($key eq 'p')
+#		{
+#			say "play";
+#			printf "state %d", $player->state;
+#			$player->load( "/Users/operator1732/Downloads/mp3/frozen/go.mp3" ) unless $player->state;
+#		}
+#		elsif( $key eq 's')
+#		{
+#			printf "state %d", $player->state;
+#			say "stop!";
+#			$player->stop if $player->state != 0 ;
+#			say "stopped!";
+#		}
+#		elsif( $key eq 'j')
+#		{
+#			printf "state %d", $player->state;
+#			say "jump!";
+#			$player->jump(10) if $player->state ;
+#			say "jumpped!";
+#		}
+#		
+#	}
+#	$player->poll( 0 ) if $player->state;
+#}
+#
+#ReadMode 0;
+#
+#
+#
+  use Config::Simple;
 
-    # same as Audio::Play::MPG123
-    $player = Audio::Play::MPlayer->new;
-	print "play";
-#    $player->load( "/media/backup/MP3/A/01.m4a" );
-	$player->statfreq(0.5);
-    $player->load( "/media/backup/MP3/A/timber.mp3" );
-    print $player->title, "\n";
-
-#	$player->stop;
-	while ($player->state) {
-		say $player->state;
-		$player->poll(1);
-	}
-
-#    $player->poll( 1 ) until $player->state == 0;
-	
+  # --- Simple usage. Loads the config. file into a hash:
+  Config::Simple->import_from('app.ini', \%Config);
 
 
+  # --- OO interface:
+  $cfg = new Config::Simple('app.ini');
 
-
+#  # accessing values:
+  $user = $cfg->param('mysql.password');
+  say $user;
+#
+#  # getting the values as a hash:
+#  %Config = $cfg->vars();
+#  foreach (keys %Config) {
+#	  say $Config{$_};
+#  }
+#
+#  # updating value with a string
+  say $cfg->param('mysql.user', "asdfx");
+#
+#  # updating a value with an array:
+#  $cfg->param('Users', ['sherzodR', 'geek', 'merlyn']);
+#
+#  # adding a new block to an ini-file:
+#  $cfg->param(-block=>'last-access', -values=>{'time'=>time()});
+#
+#  # accessing a block of an ini-file;
+#  $mysql = $cfg->param(-block=>'mysql');
+#
+#  # saving the changes back to file:
+#  $cfg->save();
+#
+#
+#  # --- tie() interface
+#  tie %Config, "Config::Simple", 'app.ini';
