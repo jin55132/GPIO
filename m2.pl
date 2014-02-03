@@ -97,7 +97,7 @@ use Term::ReadKey;
   use Config::Simple;
 
   # --- Simple usage. Loads the config. file into a hash:
-  Config::Simple->import_from('app.ini', \%Config);
+#  Config::Simple->import_from('app.ini', \%Config);
 
 
   # --- OO interface:
@@ -106,27 +106,29 @@ use Term::ReadKey;
 #  # accessing values:
   $user = $cfg->param('mysql.password');
   say $user;
+  %Config = $cfg->vars();
 #
 #  # getting the values as a hash:
 #  %Config = $cfg->vars();
 #  foreach (keys %Config) {
-#	  say $Config{$_};
+#	  say "$_ = $Config{$_}";
 #  }
 #
-#  # updating value with a string
-  say $cfg->param('mysql.user', "asdfx");
+  $cfg->param('DFF.User', 'sherzodR');
+  #  # updating value with a string
 #
 #  # updating a value with an array:
-#  $cfg->param('Users', ['sherzodR', 'geek', 'merlyn']);
+  $cfg->param('Users', ['sherzodR', 'geek', 'merlyn']);
 #
-#  # adding a new block to an ini-file:
-#  $cfg->param(-block=>'last-access', -values=>{'time'=>time()});
+  # adding a new block to an ini-file:
+  $cfg->param(-block=>'last-access', -values=>{'time'=>time()});
 #
 #  # accessing a block of an ini-file;
-#  $mysql = $cfg->param(-block=>'mysql');
+  $mysql = $cfg->param(-block=>'mysql');
+  say $mysql->{password};
 #
 #  # saving the changes back to file:
-#  $cfg->save();
+  $cfg->save();
 #
 #
 #  # --- tie() interface

@@ -3,13 +3,13 @@
 use 5.010;
 use File::Spec::Functions qw (catfile);
 use File::Glob qw( bsd_glob );
-use Audio::Play::MPlayer;
+#use Audio::Play::MPlayer;
 use Audio::Play::MPG123;
 use Term::ReadKey;
 use Time::HiRes qw ( time alarm sleep );
 use File::Find;
 use List::Util;
-use Device::BCM2835;
+use Device::BCM2835 qw (init);
 use Proc::PID::File;
 use Proc::Daemon;
 use strict;
@@ -27,13 +27,15 @@ my @current_songs;
 if (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
 { 
 		print "Already running!";
-	}else {
-			Proc::Daemon->Init();
-			unless (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
-			{
-				&main;
-			}
-	}
+} 
+else 
+{
+		Proc::Daemon->Init();
+		unless (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
+		{
+			&main;
+		}
+}
 
 sub main {
 			 
