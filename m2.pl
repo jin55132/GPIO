@@ -1,4 +1,4 @@
-#!/osr/bin/perl 
+##!/osr/bin/perl 
 #use strict;
 #rse warnings;
 use 5.010;
@@ -42,14 +42,14 @@ use 5.010;
 #say $pid;
 #Daemon::Mplayer::mplayer_stop($pid);
 #------------------------------------------------
-#use Audio::Play::MPlayer;
-##use Term::ReadKey;
+use Audio::Play::MPlayer;
+use Term::ReadKey;
 #
 ##ReadMode 4;
 #
 #
 #
-#$player = Audio::Play::MPlayer->new;
+$player = Audio::Play::MPlayer->new;
 #say $player->state;
 #$player->load( "/Users/operator1732/Downloads/mp3/frozen/go.mp3" ) unless $player->state;
 #$player->poll(0);
@@ -58,39 +58,39 @@ use 5.010;
 #
 #$player->poll(0) until $player->state == 0;
 
-#while (1)
-#{
+while (1)
+{
+
+
+	my $key = Term::ReadKey::ReadKey(-1);
+	$player->poll( 1 ) if $player->state;
+	if(defined $key){
+	
+		if($key eq 'p')
+		{
+			say "play";
+			printf "state %d", $player->state;
+			$player->load( "/media/backup/MP3/A/message.mp3" ) unless $player->state;
+		}
+		elsif( $key eq 's')
+		{
+			printf "state %d", $player->state;
+			say "stop!";
+			$player->stop; 
+			say "stopped!";
+		}
+		elsif( $key eq 'j')
+		{
+			printf "state %d", $player->state;
+			say "jump!";
+			$player->jump(10) if $player->state ;
+			say "jumpped!";
+		}
+		
+	}
+}
 #
-#
-#	my $key = Term::ReadKey::ReadKey(-1);
-#	if(defined $key){
-#	
-#		if($key eq 'p')
-#		{
-#			say "play";
-#			printf "state %d", $player->state;
-#			$player->load( "/Users/operator1732/Downloads/mp3/frozen/go.mp3" ) unless $player->state;
-#		}
-#		elsif( $key eq 's')
-#		{
-#			printf "state %d", $player->state;
-#			say "stop!";
-#			$player->stop if $player->state != 0 ;
-#			say "stopped!";
-#		}
-#		elsif( $key eq 'j')
-#		{
-#			printf "state %d", $player->state;
-#			say "jump!";
-#			$player->jump(10) if $player->state ;
-#			say "jumpped!";
-#		}
-#		
-#	}
-#	$player->poll( 0 ) if $player->state;
-#}
-#
-#ReadMode 0;
+ReadMode 0;
 #
 #
 #
