@@ -8,7 +8,8 @@ use Audio::Play::MPG123;
 use Term::ReadKey;
 use Time::HiRes qw ( time alarm sleep );
 use File::Find;
-
+use List::Util;
+use strict;
 #use Device::BCM2835;
 
 
@@ -19,11 +20,11 @@ use File::Find;
 #Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_15,&Device::BCM2835::BCM2835_GPIO_FSEL_INPT) ;
 
 my $isPlaying = 0;
-my $isTimeToNextSong;
-my @music_dirs = &getMusicDirectories('/media/backup/MP3'); 
-#my @music_dirs = &getMusicDirectories('~/Downloads/mp3'); 
+my $isTimeToNextSong= 0;
+#my @music_dirs = &getMusicDirectories('/media/backup/MP3'); 
+my @music_dirs = &getMusicDirectories('~/Downloads/mp3'); 
 my @current_dirs;
-my @musics;
+my @current_songs;
 #my $player = Audio::Play::MPlayer->new;
 my $player = Audio::Play::MPG123->new;
 
@@ -36,24 +37,25 @@ while(1)
 #	   if (1 == Device::BCM2835::gpio_lev(&Device::BCM2835::RPI_V2_GPIO_P1_12))
 	   if ($key eq 'p')
 	   {
+			$isTimeToNextSong = 1;
 		   if ($isPlaying){
 			   say "Try Stop";
-			   @musics = undef;
-				}
+			   @current_songs = undef;
+			   @current_dirs = undef;
+			}
 		   else{
 			   say "Play";
 			   	@current_dirs = @music_dirs;
-#				@musics = &getMusicToPlay(shift @current_dirs);
-				@musics = &getNextAlbum;
+				@current_dirs = List::Util::shuffle @current_dirs;
+				@current_songs = &getNextAlbum;
 		   }
-			$isTimeToNextSong = 1;
 		   #Device::BCM2835::delay(500); # Milliseconds
 	   }
 #	   elsif (1 == Device::BCM2835::gpio_lev(&Device::BCM2835::RPI_V2_GPIO_P1_13))
 	   elsif ($key eq 'N')
 	   {
 		   if ($isPlaying){
-				@musics = &getNextAlbum;
+				@current_songs = &getNextAlbum;
 		   		say "#next album";
 				$isTimeToNextSong = 1;
 		   }
@@ -64,6 +66,9 @@ while(1)
 	   {
 		   #next song
 		   if ($isPlaying){
+				unless(@current_songs) {
+					@current_songs = &getNextAlbum;
+				}
 			$isTimeToNextSong = 1;
 	   		say "#next song";
 
@@ -71,25 +76,25 @@ while(1)
 #			Device::BCM2835::delay(500); # Milliseconds
 	   }
 
-
    sleep(0.5);
 
 	}
 	
 	   $player->poll(0);
 	   if(defined ($player->state)){
-		   if($player->state == 3 and $isPlaying)
+		   if($player->state == 0 and $isPlaying)
 		   {
 			   $isTimeToNextSong = 1;
 			   $isPlaying = 0;
 		   } else {
+
 		   }
 	   }
 
-	   if( defined($isTimeToNextSong) )
+	   if($isTimeToNextSong )
 	   {
 		   say "Time to Next Song";
-		   my $songToPlay = shift @musics;
+		   my $songToPlay = shift @current_songs;
 
 	   		if ($isPlaying){
 				$player->poll(0);
@@ -100,31 +105,33 @@ while(1)
 
 		   if(defined($songToPlay)){
 			$isPlaying = 1;	
+			$isTimeToNextSong = 0;
 			$player->load($songToPlay);
 			say "play : ". $songToPlay;
 		   } else {
-			   say "$current_dirs[0]";
-			   say "no song in directory";
+				@current_songs = &getNextAlbum;
+				unless(@current_songs) {
+					$isTimeToNextSong = 0;	
+					$isPlaying = 0;
+					say "finish!!!";
+				}
 		   }
-			$isTimeToNextSong = undef;
 	   }
 }
 
 #ReadMode 0; # Reset tty mode before exiting
 sub getNextAlbum {
-
 	my @songs;
 	until (@songs){
 	    my $dir = shift @current_dirs;
+		
+		return () unless defined $dir;
+
 	 	@songs = &getMusicToPlay( $dir );
 	 }
 	 return @songs;
 }
 
-sub nextSong {
-	
-
-}
 
 sub getMusicDirectories {
 	my $music_dirs = shift @_;
@@ -136,6 +143,8 @@ sub getMusicDirectories {
 
 sub getMusicToPlay {
 	my $dir_to_play = shift @_;
+
+
 	my $dir = $dir_to_play;
 	$dir_to_play =~ s/\[/\\\[/g;
 	$dir_to_play =~ s/\]/\\\]/g;
