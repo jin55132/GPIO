@@ -49,7 +49,7 @@ use Term::ReadKey;
 #
 #
 #
-$player = Audio::Play::MPlayer->new;
+#$player = Audio::Play::MPlayer->new;
 #say $player->state;
 #$player->load( "/Users/operator1732/Downloads/mp3/frozen/go.mp3" ) unless $player->state;
 #$player->poll(0);
@@ -58,39 +58,39 @@ $player = Audio::Play::MPlayer->new;
 #
 #$player->poll(0) until $player->state == 0;
 
-while (1)
-{
-
-
-	my $key = Term::ReadKey::ReadKey(-1);
-	$player->poll( 1 ) if $player->state;
-	if(defined $key){
-	
-		if($key eq 'p')
-		{
-			say "play";
-			printf "state %d", $player->state;
-			$player->load( "/media/backup/MP3/A/message.mp3" ) unless $player->state;
-		}
-		elsif( $key eq 's')
-		{
-			printf "state %d", $player->state;
-			say "stop!";
-			$player->stop; 
-			say "stopped!";
-		}
-		elsif( $key eq 'j')
-		{
-			printf "state %d", $player->state;
-			say "jump!";
-			$player->jump(10) if $player->state ;
-			say "jumpped!";
-		}
-		
-	}
-}
+#while (1)
+#{
 #
-ReadMode 0;
+#
+#	my $key = Term::ReadKey::ReadKey(-1);
+#	$player->poll( 1 ) if $player->state;
+#	if(defined $key){
+#	
+#		if($key eq 'p')
+#		{
+#			say "play";
+#			printf "state %d", $player->state;
+#			$player->load( "/media/backup/MP3/A/message.mp3" ) unless $player->state;
+#		}
+#		elsif( $key eq 's')
+#		{
+#			printf "state %d", $player->state;
+#			say "stop!";
+#			$player->stop; 
+#			say "stopped!";
+#		}
+#		elsif( $key eq 'j')
+#		{
+#			printf "state %d", $player->state;
+#			say "jump!";
+#			$player->jump(10) if $player->state ;
+#			say "jumpped!";
+#		}
+#		
+#	}
+#}
+##
+#ReadMode 0;
 #
 #
 #
