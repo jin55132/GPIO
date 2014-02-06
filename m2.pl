@@ -101,7 +101,7 @@ use Term::ReadKey;
 
 
   # --- OO interface:
-  $cfg = new Config::Simple('app.ini');
+  $cfg = new Config::Simple('pibox.conf');
 
 #  # accessing values:
   $user = $cfg->param('mysql.password');
@@ -110,9 +110,9 @@ use Term::ReadKey;
 #
 #  # getting the values as a hash:
 #  %Config = $cfg->vars();
-#  foreach (keys %Config) {
-#	  say "$_ = $Config{$_}";
-#  }
+  foreach (keys %Config) {
+	  say "$_ = $Config{$_}";
+  }
 #
   $cfg->param('DFF.User', 'sherzodR');
   #  # updating value with a string
@@ -126,6 +126,7 @@ use Term::ReadKey;
 #  # accessing a block of an ini-file;
   $mysql = $cfg->param(-block=>'mysql');
   say $mysql->{password};
+  say $Config{'directory'};
 #
 #  # saving the changes back to file:
   $cfg->save();

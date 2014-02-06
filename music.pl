@@ -9,9 +9,10 @@ use Term::ReadKey;
 use Time::HiRes qw ( time alarm sleep );
 use File::Find;
 use List::Util;
-use Device::BCM2835 qw (init);
+use Device::BCM2835 ;
 use Proc::PID::File;
 use Proc::Daemon;
+use Config::Simple;
 use strict;
 
 #Device::BCM2835::set_debug(1);
@@ -22,6 +23,7 @@ my @music_dirs;
 #my @music_dirs = &getMusicDirectories('~/Downloads/mp3'); 
 my @current_dirs;
 my @current_songs;
+my $cfg;
 #my $player = Audio::Play::MPlayer->new;
 	
 if (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
@@ -30,7 +32,7 @@ if (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
 } 
 else 
 {
-		Proc::Daemon->Init();
+#		Proc::Daemon->Init();
 		unless (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
 		{
 			&main;
@@ -46,8 +48,13 @@ Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_12,&Device::BCM2835:
 Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_13,&Device::BCM2835::BCM2835_GPIO_FSEL_INPT) ;
 Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_15,&Device::BCM2835::BCM2835_GPIO_FSEL_INPT) ;
 
+	$cfg = new Config::Simple('pibox.ini');
+	my %config = $cfg->vars();
+	say $config{"default.directory"};
+
+
 	my $player = Audio::Play::MPG123->new;
-	@music_dirs = &getMusicDirectories('/media/backup/MP3'); 
+	@music_dirs = &getMusicDirectories($config{"default.directory"});
 	while(1)
 	{
 		my $key = Term::ReadKey::ReadKey(-1);
