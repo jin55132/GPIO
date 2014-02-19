@@ -10,10 +10,12 @@ use Time::HiRes qw ( time alarm sleep );
 use File::Find;
 use List::Util;
 use Device::BCM2835 ;
+use Cwd;
 use Proc::PID::File;
 use Proc::Daemon;
 use Config::Simple;
 use strict;
+
 
 #Device::BCM2835::set_debug(1);
 
@@ -24,6 +26,7 @@ my @music_dirs;
 my @current_dirs;
 my @current_songs;
 my $cfg;
+my $pwd = getcwd;
 #my $player = Audio::Play::MPlayer->new;
 	
 if (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
@@ -32,11 +35,17 @@ if (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
 } 
 else 
 {
-#		Proc::Daemon->Init();
-		unless (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
-		{
+	print "Start jukebox\n";
+    my $daemon = Proc::Daemon->new( work_dir => $pwd, child_STDOUT => '/run/shm/out', child_STDERR => '/run/shm/err');
+	print "init\n";
+    $daemon->Proc::Daemon::Init;
+	
+	print "Start Daemon";
+	unless (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
+	{
+		say "start main func";
 			&main;
-		}
+	}
 }
 
 sub main {
@@ -55,6 +64,7 @@ Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_15,&Device::BCM2835:
 
 	my $player = Audio::Play::MPG123->new;
 	@music_dirs = &getMusicDirectories($config{"default.directory"});
+	
 	while(1)
 	{
 		my $key = Term::ReadKey::ReadKey(-1);
@@ -92,7 +102,7 @@ Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_15,&Device::BCM2835:
 					}
 				$isTimeToNextSong = 1;
 		   		say "#next song";
-	
+
 			   }
 	#			Device::BCM2835::delay(500); # Milliseconds
 		   }
