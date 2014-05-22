@@ -29,23 +29,26 @@ my $cfg;
 my $pwd = getcwd;
 #my $player = Audio::Play::MPlayer->new;
 	
-if (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
+if (Proc::PID::File->running(name => "jukebox", dir => "/var/run"))
 { 
 		print "Already running!";
 } 
 else 
 {
 	print "Start jukebox\n";
-    my $daemon = Proc::Daemon->new( work_dir => $pwd, child_STDOUT => '/run/shm/out', child_STDERR => '/run/shm/err');
+    my $daemon = Proc::Daemon->new( work_dir => $pwd, child_STDOUT => '/var/log/out', child_STDERR => '/var/log/err');
 	print "init\n";
     $daemon->Proc::Daemon::Init;
 	
 	print "Start Daemon";
-	unless (Proc::PID::File->running(name => "jukebox", dir => "/run/shm"))
+
+	unless (Proc::PID::File->running(name => "jukebox", dir => "/var/run"))
 	{
 		say "start main func";
 			&main;
 	}
+
+	say "Failed to start";
 }
 
 sub main {
@@ -57,7 +60,7 @@ Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_12,&Device::BCM2835:
 Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_13,&Device::BCM2835::BCM2835_GPIO_FSEL_INPT) ;
 Device::BCM2835::gpio_fsel(&Device::BCM2835::RPI_V2_GPIO_P1_15,&Device::BCM2835::BCM2835_GPIO_FSEL_INPT) ;
 
-	$cfg = new Config::Simple('pibox.ini');
+	$cfg = new Config::Simple('/etc/music.ini');
 	my %config = $cfg->vars();
 	say $config{"default.directory"};
 
